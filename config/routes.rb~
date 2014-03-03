@@ -1,0 +1,76 @@
+Mmagap::Application.routes.draw do
+
+
+  resources :student_teacher_profiles
+
+  resources :comments
+
+  resources :comment_likes
+
+
+  resources :likes
+  
+  resources :videos  
+  
+  
+  
+  #following system
+  resources :relationships, only: [:create, :destroy]
+  
+ 
+  post "zencoder-callback" => "zencoder_callback#create", :as => "zencoder_callback"
+  get 'tags/:tag', to: 'videos#tag_page', as: :tag
+  devise_for :users, :controllers => { :omniauth_callbacks => "omniauth_callbacks" }
+  devise_for :users
+  match 'users/:id' => 'users#show'
+
+  devise_scope :user do
+    get 'register' , :to => 'devise/registrations#new', as: :register
+    get 'dashboard', :to => 'users#dashboard', as: :dashboard
+    get 'user/following/:id', to: 'users#following', as: :following
+    get 'user/followers/:id', to: 'users#followers', as: :followers
+  end
+
+  match '/home' => 'videos#index', :as => 'home'
+  match '/lesson' => 'videos#lesson'
+  match '/tags' => 'videos#tag_page', :as => 'tags'
+  resources :videos do
+    member do
+      get 'inappropriate'
+    end 
+          resources :comments
+          member { post :vote }
+    end
+
+
+  resources :users
+  resources :plans
+  resources :subscriptions
+  get "paypal/checkout", to: "subscriptions#paypal_checkout"
+
+  resources :requests
+  resources :homes
+
+  match "/404", :to => "videos#index"
+
+  resources :conversations, only: [:index, :show, :new, :create] do
+    member do
+      post :reply
+      post :trash
+      post :untrash
+    end
+  end
+  match '/new_within_follow' => 'conversations#new_within_follow', via: :get
+  match '/start' => 'conversations#start', :via => :get
+  match '/find_user' => 'users#find_user', :via => :get
+
+resources :messages
+  match '/profile' => 'users#profile', :via => :get
+  match '/userspage' => 'static#userspage', :via => :get
+  match '/help' => 'static#help', :via => :get
+  match '/termsofuse' => 'static#termsofuse', :via => :get
+  match '/aboutus' => 'static#aboutus', :via => :get
+  match '/contactus' => 'static#contactus', :via => :get
+
+  root :to => 'videos#index'
+end
