@@ -5,7 +5,11 @@ Mmagap::Application.routes.draw do
   resources :comment_likes
   resources :likes
   
-  
+  devise_for :admin_users, ActiveAdmin::Devise.config
+ 
+  ActiveAdmin.routes(self) 
+  #devise_for :admin_users, ActiveAdmin::Devise.config, ActiveAdmin::Devise.config
+  devise_for :admin_users, ActiveAdmin::Devise.config
   #resources :videos  
  
   
